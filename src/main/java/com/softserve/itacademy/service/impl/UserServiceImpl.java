@@ -4,6 +4,7 @@ import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.User;
 import com.softserve.itacademy.repository.UserRepository;
 import com.softserve.itacademy.service.UserService;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
     public User create(User user) {
         try {
             return userRepository.save(user);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidDataAccessApiUsageException | IllegalArgumentException e) {
             throw new NullEntityReferenceException("User cannot be null");
         }
     }
@@ -41,9 +42,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         if (user != null) {
-            User oldUser = readById(user.getId());
+            User oldUser;
+            try {
+                oldUser = readById(user.getId());
+            } catch (IllegalArgumentException e) {
+                throw new NullEntityReferenceException("User id cannot be null");
+            }
             if (oldUser != null) {
-                return userRepository.save(user);
+                try {
+                    return userRepository.save(user);
+                } catch (InvalidDataAccessApiUsageException | IllegalArgumentException e) {
+                    throw new NullEntityReferenceException("User cannot be null");
+                }
             }
         }
         throw new NullEntityReferenceException("User can`t be 'null'");
