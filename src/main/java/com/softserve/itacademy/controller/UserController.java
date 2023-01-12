@@ -27,22 +27,20 @@ public class UserController {
 
     @GetMapping("/create")
     public String create(Model model) {
+        model.addAttribute("user", new User());
         return "create-user";
     }
 
     @PostMapping("/create")
     public String create(@Validated @ModelAttribute("user") User user, BindingResult result) {
-        try {
-            if (result.hasErrors() && result.hasFieldErrors()) {
-                throw new NullEntityReferenceException("User cannot be null");
+
+            if (result.hasErrors()) {
+                throw new NullEntityReferenceException("User id cannot be null");
             }
             user.setPassword(user.getPassword());
             user.setRole(roleService.readById(2));
             User newUser = userService.create(user);
             return "redirect:/todos/all/users/" + newUser.getId();
-        } catch (ValidationException e) {
-            throw new NullEntityReferenceException("User cannot be null");
-        }
     }
 
     @GetMapping("/{id}/read")
@@ -66,7 +64,7 @@ public class UserController {
          if (result.hasErrors()) {
             user.setRole(oldUser.getRole());
             model.addAttribute("roles", roleService.getAll());
-            throw new NullEntityReferenceException("User cannot be null");
+            throw new NullEntityReferenceException("User id " + id +" cannot be null");
         }
         if (oldUser.getRole().getName().equals("USER")) {
             user.setRole(oldUser.getRole());
