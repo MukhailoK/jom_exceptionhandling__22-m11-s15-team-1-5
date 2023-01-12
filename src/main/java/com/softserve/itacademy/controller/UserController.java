@@ -1,6 +1,5 @@
 package com.softserve.itacademy.controller;
 
-import com.softserve.itacademy.dto.UserDto;
 import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.User;
 import com.softserve.itacademy.service.RoleService;
@@ -34,6 +33,7 @@ public class UserController {
 
     @PostMapping("/create")
     public String create(@Validated @ModelAttribute("user") User user, BindingResult result) {
+
             if (result.hasErrors()) {
                 throw new NullEntityReferenceException("User id cannot be null");
             }

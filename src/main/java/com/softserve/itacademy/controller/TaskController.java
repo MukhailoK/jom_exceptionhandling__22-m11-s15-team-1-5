@@ -2,6 +2,7 @@ package com.softserve.itacademy.controller;
 
 import com.softserve.itacademy.dto.TaskDto;
 import com.softserve.itacademy.dto.TaskTransformer;
+import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.Priority;
 import com.softserve.itacademy.model.Task;
 import com.softserve.itacademy.service.StateService;
@@ -40,7 +41,7 @@ public class TaskController {
         if (result.hasErrors()) {
             model.addAttribute("todo", todoService.readById(todoId));
             model.addAttribute("priorities", Priority.values());
-            return "create-task";
+            throw new NullEntityReferenceException("Task cannot be null");
         }
         Task task = TaskTransformer.convertToEntity(
                 taskDto,
@@ -66,7 +67,7 @@ public class TaskController {
         if (result.hasErrors()) {
             model.addAttribute("priorities", Priority.values());
             model.addAttribute("states", stateService.getAll());
-            return "update-task";
+            throw new NullEntityReferenceException("Task cannot be null");
         }
         Task task = TaskTransformer.convertToEntity(
                 taskDto,
