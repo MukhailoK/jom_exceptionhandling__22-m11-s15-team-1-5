@@ -8,6 +8,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,10 @@ public class UserServiceImpl implements UserService {
     public User create(User user) {
         try {
             return userRepository.save(user);
-        } catch (InvalidDataAccessApiUsageException | IllegalArgumentException e) {
+        } catch (InvalidDataAccessApiUsageException
+                 | NullPointerException
+                 | ValidationException
+                 | IllegalArgumentException e) {
             throw new NullEntityReferenceException("User cannot be null");
         }
     }
@@ -51,7 +55,7 @@ public class UserServiceImpl implements UserService {
             if (oldUser != null) {
                 try {
                     return userRepository.save(user);
-                } catch (InvalidDataAccessApiUsageException | IllegalArgumentException e) {
+                } catch (InvalidDataAccessApiUsageException| ValidationException | IllegalArgumentException e) {
                     throw new NullEntityReferenceException("User cannot be null");
                 }
             }
