@@ -16,11 +16,12 @@ import java.util.Optional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
-    private TaskRepository taskRepository;
-    private ToDoRepository todoRepository;
+    private final TaskRepository taskRepository;
+    private final ToDoRepository todoRepository;
 
-    public TaskServiceImpl(TaskRepository taskRepository) {
+    public TaskServiceImpl(TaskRepository taskRepository, ToDoRepository todoRepository) {
         this.taskRepository = taskRepository;
+        this.todoRepository = todoRepository;
     }
 
     @Override
@@ -83,7 +84,8 @@ public class TaskServiceImpl implements TaskService {
         if (optional.isPresent()) {
             List<Task> tasks = taskRepository.getByTodoId(todoId);
             return tasks.isEmpty() ? new ArrayList<>() : tasks;
+        } else {
+            throw new EntityNotFoundException("Todo with id " + todoId + " not found");
         }
-        throw new EntityNotFoundException("Todo with id " + todoId + " not found");
     }
 }
