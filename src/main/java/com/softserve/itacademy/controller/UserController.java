@@ -1,18 +1,23 @@
 package com.softserve.itacademy.controller;
 
+import com.softserve.itacademy.dto.UserDto;
+import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.User;
 import com.softserve.itacademy.service.RoleService;
 import com.softserve.itacademy.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ValidationException;
+
 @Controller
 @RequestMapping("/users")
 public class UserController {
-
     private final UserService userService;
     private final RoleService roleService;
 
@@ -29,13 +34,13 @@ public class UserController {
 
     @PostMapping("/create")
     public String create(@Validated @ModelAttribute("user") User user, BindingResult result) {
-        if (result.hasErrors()) {
-            return "create-user";
-        }
-        user.setPassword(user.getPassword());
-        user.setRole(roleService.readById(2));
-        User newUser = userService.create(user);
-        return "redirect:/todos/all/users/" + newUser.getId();
+            if (result.hasErrors()) {
+                throw new NullEntityReferenceException("User id cannot be null");
+            }
+            user.setPassword(user.getPassword());
+            user.setRole(roleService.readById(2));
+            User newUser = userService.create(user);
+            return "redirect:/todos/all/users/" + newUser.getId();
     }
 
     @GetMapping("/{id}/read")
@@ -51,6 +56,23 @@ public class UserController {
         model.addAttribute("user", user);
         model.addAttribute("roles", roleService.getAll());
         return "update-user";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(@PathVariable long id, @Validated @ModelAttribute("user") User user, BindingResult result, @RequestParam("roleId") long roleId, Model model) {
+        User oldUser = userService.readById(id);
+         if (result.hasErrors()) {
+            user.setRole(oldUser.getRole());
+            model.addAttribute("roles", roleService.getAll());
+            throw new NullEntityReferenceException("User id " + id +" cannot be null");
+        }
+        if (oldUser.getRole().getName().equals("USER")) {
+            user.setRole(oldUser.getRole());
+        } else {
+            user.setRole(roleService.readById(roleId));
+        }
+        userService.update(user);
+        return "redirect:/users/" + id + "/read";
     }
 
 
