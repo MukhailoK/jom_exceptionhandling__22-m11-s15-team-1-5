@@ -17,8 +17,14 @@ public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(NullEntityReferenceException.class)
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ModelAndView nullEntityReferenceExceptionHandler(HttpServletRequest request, NullEntityReferenceException exception) {
+        return getModelAndView(request, HttpStatus.BAD_REQUEST, exception);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ModelAndView internalServerErrorHandler(HttpServletRequest request, NullEntityReferenceException exception) {
         return getModelAndView(request, HttpStatus.INTERNAL_SERVER_ERROR, exception);
     }
 
