@@ -1,5 +1,6 @@
 package com.softserve.itacademy.controller;
 
+import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.Task;
 import com.softserve.itacademy.model.ToDo;
 import com.softserve.itacademy.model.User;
@@ -40,7 +41,7 @@ public class ToDoController {
     @PostMapping("/create/users/{owner_id}")
     public String create(@PathVariable("owner_id") long ownerId, @Validated @ModelAttribute("todo") ToDo todo, BindingResult result) {
         if (result.hasErrors()) {
-            return "create-todo";
+            throw new NullEntityReferenceException("Todo cannot be null");
         }
         todo.setCreatedAt(LocalDateTime.now());
         todo.setOwner(userService.readById(ownerId));
@@ -72,7 +73,7 @@ public class ToDoController {
                          @Validated @ModelAttribute("todo") ToDo todo, BindingResult result) {
         if (result.hasErrors()) {
             todo.setOwner(userService.readById(ownerId));
-            return "update-todo";
+            throw new NullEntityReferenceException("Todo with id: " + todoId +" cannot be null");
         }
         ToDo oldTodo = todoService.readById(todoId);
         todo.setOwner(oldTodo.getOwner());
