@@ -35,7 +35,7 @@ public class UserController {
     public String create(@Validated @ModelAttribute("user") User user, BindingResult result) {
 
             if (result.hasErrors()) {
-                throw new NullEntityReferenceException("User id cannot be null");
+                throw new NullEntityReferenceException("User cannot be null");
             }
             user.setPassword(user.getPassword());
             user.setRole(roleService.readById(2));
@@ -64,7 +64,7 @@ public class UserController {
          if (result.hasErrors()) {
             user.setRole(oldUser.getRole());
             model.addAttribute("roles", roleService.getAll());
-            throw new NullEntityReferenceException("User id " + id +" cannot be null");
+            throw new NullEntityReferenceException("User with id: " + id +" cannot have null parameters");
         }
         if (oldUser.getRole().getName().equals("USER")) {
             user.setRole(oldUser.getRole());
