@@ -22,17 +22,22 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+
     @Override
     public User create(User user) {
-        try {
-            return userRepository.save(user);
-        } catch (InvalidDataAccessApiUsageException
-                 | NullPointerException
-                 | ValidationException
-                 | IllegalArgumentException e) {
-            throw new NullEntityReferenceException("User cannot be null");
+        if(checkExistEmail(user.getEmail())){
+            throw new NullEntityReferenceException("User with email: "+ user.getEmail()+" already exist");
         }
+        return userRepository.save(user);
     }
+
+    private boolean checkExistEmail(String email) {
+        List<User> users = userRepository.findAll();
+        var existedMail = users
+                .stream().map(e -> e.getEmail()).filter(e -> e.equals(email)).findFirst();
+        return existedMail.isPresent();
+    }
+
 
     @Override
     public User readById(long id) {
@@ -40,7 +45,7 @@ public class UserServiceImpl implements UserService {
         if (optional.isPresent()) {
             return optional.get();
         }
-        throw new EntityNotFoundException("User with id " + id + " not found");
+        throw new EntityNotFoundException("User with id: " + id + " not found");
     }
 
     @Override
@@ -55,7 +60,7 @@ public class UserServiceImpl implements UserService {
             if (oldUser != null) {
                 try {
                     return userRepository.save(user);
-                } catch (InvalidDataAccessApiUsageException| ValidationException | IllegalArgumentException e) {
+                } catch (InvalidDataAccessApiUsageException | ValidationException | IllegalArgumentException e) {
                     throw new NullEntityReferenceException("User cannot be null");
                 }
             }
