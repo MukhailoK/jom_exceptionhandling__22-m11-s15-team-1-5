@@ -33,7 +33,6 @@ public class UserController {
 
     @PostMapping("/create")
     public String create(@Validated @ModelAttribute("user") User user, BindingResult result) {
-
             if (result.hasErrors()) {
                 throw new NullEntityReferenceException("User cannot be null");
             }
